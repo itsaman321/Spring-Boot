@@ -1,9 +1,7 @@
 package com.cognizant.menuservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +9,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Getter
+@Setter
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
