@@ -15,6 +15,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="order-service" target="20" />
+      <module name="user-service" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
