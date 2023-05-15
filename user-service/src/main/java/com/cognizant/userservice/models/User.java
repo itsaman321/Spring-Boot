@@ -1,9 +1,6 @@
 package com.cognizant.userservice.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
@@ -20,10 +18,10 @@ public class User {
 
     private String user_name ;
 
-    private String email ;
+    private String user_email ;
 
     private String user_phone ;
 
-    private String password ;
+    private String user_password ;
 
 }
