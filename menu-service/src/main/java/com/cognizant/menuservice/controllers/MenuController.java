@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.Inet4Address;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,17 @@ public class MenuController {
 
     @PostMapping
     public String createMenuItem(@RequestBody Menu menu){
-        return menuService.createMenuItem(menu);
+        menuService.createMenuItem(menu);
+        return "Menu Item Successfully created" ;
+    }
+
+    @PutMapping("/{id}")
+    public String updateMenuItem(@PathVariable Integer id, @RequestBody Menu menu){
+        return menuService.updateMenuItem(id , menu) ;
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteMenuItem(@PathVariable Integer id){
+        return menuService.deleteItem(id);
     }
 }
