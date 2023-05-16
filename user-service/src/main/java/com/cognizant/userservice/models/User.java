@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -23,5 +25,8 @@ public class User {
     private String user_phone ;
 
     private String user_password ;
+
+    @Transient
+    List<Order> user_orders ;
 
 }
