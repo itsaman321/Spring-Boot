@@ -1,13 +1,17 @@
 package com.cognizant.menuservice.service;
 
+import aj.org.objectweb.asm.TypeReference;
 import com.cognizant.menuservice.exceptions.ResourceNotFoundException;
+import com.cognizant.menuservice.model.Inventory;
 import com.cognizant.menuservice.model.Menu;
 import com.cognizant.menuservice.repository.MenuRepository;
 import lombok.AllArgsConstructor;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +19,33 @@ import java.util.Optional;
 @AllArgsConstructor
 public class MenuService {
     private MenuRepository menuRepository ;
-
+    private WebClient webClient ;
     public List<Menu> getAllItems(){
-       return menuRepository.findAll() ;
+//       return menuRepository.findAll() ;
+        List<Menu> menuItems = menuRepository.findAll();
+        List<Inventory> fetchedIngredient =  webClient.get()
+                .uri("http://localhost:8082/api/inventory")
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<Inventory>>() {})
+                .block() ;
+
+
+        for(Menu menu : menuItems){
+            List<Inventory> finalList = new ArrayList<>();
+            List<Integer> ingIds = menu.getIngredientIds();
+            if(ingIds!=null){
+                for(Integer id : ingIds){
+                    for(Inventory fIng : fetchedIngredient){
+                        if(id.equals(fIng.getIngredient_id())){
+                            finalList.add(fIng);
+                        }
+                    }
+                }
+            }
+            menu.setIngredients(finalList);
+        }
+
+        return menuItems ;
     }
 
     public String createMenuItem(Menu menu){
@@ -35,7 +63,6 @@ public class MenuService {
         updatedMenuItem.setItem_name(menu.getItem_name());
         updatedMenuItem.setItem_description(menu.getItem_description());
         updatedMenuItem.setItem_price(menu.getItem_price());
-        updatedMenuItem.setIngredients(menu.getIngredients());
 
         menuRepository.save(updatedMenuItem);
         return "Menu Item Updated Successfully" ;

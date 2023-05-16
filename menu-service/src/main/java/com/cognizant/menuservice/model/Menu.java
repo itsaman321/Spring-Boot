@@ -20,7 +20,10 @@ public class Menu {
     private String item_description ;
     private Integer item_price ;
 
-    @ManyToMany
-    private List<Ingredient> ingredients ;
+    private List<Integer> ingredientIds ;
+
+    @Transient
+    private List<Inventory> ingredients;
+
 
 }

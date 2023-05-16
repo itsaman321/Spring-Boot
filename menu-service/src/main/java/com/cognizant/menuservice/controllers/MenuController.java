@@ -1,14 +1,11 @@
 package com.cognizant.menuservice.controllers;
 
-import com.cognizant.menuservice.model.Ingredient;
+import com.cognizant.menuservice.model.Inventory;
 import com.cognizant.menuservice.model.Menu;
-import com.cognizant.menuservice.repository.MenuRepository;
 import com.cognizant.menuservice.service.MenuService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.Inet4Address;
 import java.util.List;
 import java.util.Optional;
 
