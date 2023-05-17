@@ -20,6 +20,7 @@ public class Menu {
     private String item_description ;
     private Integer item_price ;
 
+
     private List<Integer> ingredientIds ;
 
     @Transient

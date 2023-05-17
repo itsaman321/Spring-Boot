@@ -21,7 +21,7 @@ public class MenuService {
     private MenuRepository menuRepository ;
     private WebClient webClient ;
     public List<Menu> getAllItems(){
-//       return menuRepository.findAll() ;
+
         List<Menu> menuItems = menuRepository.findAll();
         List<Inventory> fetchedIngredient =  webClient.get()
                 .uri("http://localhost:8082/api/inventory")
@@ -35,7 +35,7 @@ public class MenuService {
             List<Integer> ingIds = menu.getIngredientIds();
             if(ingIds!=null){
                 for(Integer id : ingIds){
-                    for(Inventory fIng : fetchedIngredient){
+                   for(Inventory fIng : fetchedIngredient){
                         if(id.equals(fIng.getIngredient_id())){
                             finalList.add(fIng);
                         }
@@ -54,8 +54,21 @@ public class MenuService {
             return "Menu Created Successfully" ;
     }
 
-    public Optional<Menu> getItemById(Integer id) {
-        return menuRepository.findById(id) ;
+    public Menu getItemById(Integer id) {
+        Menu menu = menuRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Error in Finding Resourse with id : "+ id)) ;
+        List<Inventory> ingredientsList = new ArrayList<>() ;
+        List<Integer> idArr =  menu.getIngredientIds() ;
+        for(Integer ingId : idArr){
+            Inventory inventoryItem =  webClient.get()
+                    .uri("http://localhost:8082/api/inventory/"+ingId)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<Inventory>() {
+                    })
+                    .block() ;
+            ingredientsList.add(inventoryItem);
+        }
+        menu.setIngredients(ingredientsList);
+        return menu ;
     }
 
     public String updateMenuItem(Integer id,Menu menu) {
@@ -63,7 +76,7 @@ public class MenuService {
         updatedMenuItem.setItem_name(menu.getItem_name());
         updatedMenuItem.setItem_description(menu.getItem_description());
         updatedMenuItem.setItem_price(menu.getItem_price());
-
+        updatedMenuItem.setIngredientIds(menu.getIngredientIds());
         menuRepository.save(updatedMenuItem);
         return "Menu Item Updated Successfully" ;
     }

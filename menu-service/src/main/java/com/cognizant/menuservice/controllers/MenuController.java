@@ -21,7 +21,7 @@ public class MenuController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Menu> retrieveItemById(@PathVariable Integer id){
+    public Menu retrieveItemById(@PathVariable Integer id){
         return menuService.getItemById(id);
     }
 
