@@ -67,6 +67,7 @@ public class MenuService {
                     .block() ;
             ingredientsList.add(inventoryItem);
         }
+
         menu.setIngredients(ingredientsList);
         return menu ;
     }
