@@ -1,4 +1,4 @@
-package com.cognizant.inventoryservice.exceptions;
+package com.cognizant.menuservice.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
