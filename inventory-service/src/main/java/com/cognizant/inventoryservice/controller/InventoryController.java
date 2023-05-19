@@ -1,8 +1,10 @@
 package com.cognizant.inventoryservice.controller;
 
 import com.cognizant.inventoryservice.models.Inventory;
+import com.cognizant.inventoryservice.requestDto.SuccessResponse;
 import com.cognizant.inventoryservice.service.InventoryService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,17 +16,17 @@ import java.util.Optional;
 public class InventoryController {
     private InventoryService inventoryService ;
     @GetMapping
-    public List<Inventory> getAllIngredient(){
+    public ResponseEntity<List<Inventory>> getAllIngredient(){
         return inventoryService.getAllIngredient();
     }
 
     @GetMapping("/{id}")
-    public Inventory getIngredientById(@PathVariable Integer id){
+    public ResponseEntity<Inventory> getIngredientById(@PathVariable Integer id){
         return inventoryService.getIngredientById(id);
     }
 
     @PostMapping
-    public String createIngredient(@RequestBody Inventory ing){
+    public ResponseEntity<SuccessResponse> createIngredient(@RequestBody Inventory ing){
         return inventoryService.createIngredient(ing);
     }
 

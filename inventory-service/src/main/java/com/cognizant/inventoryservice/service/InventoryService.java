@@ -1,29 +1,43 @@
 package com.cognizant.inventoryservice.service;
 
-import com.cognizant.inventoryservice.exceptions.ResourceNotFoundException;
+import com.cognizant.inventoryservice.exceptions.MessageException;
 import com.cognizant.inventoryservice.models.Inventory;
 import com.cognizant.inventoryservice.repository.InventoryRepository;
+import com.cognizant.inventoryservice.requestDto.SuccessResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class InventoryService {
     private InventoryRepository inventoryRepository ;
-    public List<Inventory> getAllIngredient() {
-        return inventoryRepository.findAll();
+    public ResponseEntity<List<Inventory>> getAllIngredient() {
+        try{
+            List<Inventory> inventories  =  inventoryRepository.findAll();
+            return ResponseEntity.ok(inventories);
+
+        }catch (MessageException msgEx){
+            throw new MessageException("Unable to Fetch the Items. Check you connection !");
+        }
     }
 
-    public Inventory getIngredientById(Integer id) {
-        Inventory ingredient  = inventoryRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Not found"));
-        return ingredient ;
+    public ResponseEntity<Inventory> getIngredientById(Integer id) {
+        Inventory ingredient  = inventoryRepository.findById(id).orElseThrow(()-> new MessageException("User with Id "+ id + " was not found !"));
+        return ResponseEntity.ok(ingredient) ;
     }
 
-    public String createIngredient(Inventory inventory) {
-        inventoryRepository.save(inventory);
-        return "Ingredient Successfully Created" ;
+    public ResponseEntity<SuccessResponse> createIngredient(Inventory inventory) {
+        try{
+            inventoryRepository.save(inventory);
+        }catch (MessageException messageException){
+            throw new MessageException("Unable to Save Data to Database : Connection Refused");
+        }
+        return ResponseEntity.ok(new SuccessResponse("Ingredient Created Successfully with id : "
+                 + inventory.getIngredient_id(), HttpStatus.OK.toString())) ;
     }
 }
