@@ -40,4 +40,15 @@ public class InventoryService {
         return ResponseEntity.ok(new SuccessResponse("Ingredient Created Successfully with id : "
                  + inventory.getIngredient_id(), HttpStatus.OK.toString())) ;
     }
+
+    public Integer getQuantityByItem(Integer id) {
+        Inventory inventory ;
+        try{
+            inventory = inventoryRepository.findById(id).orElseThrow(()->new MessageException("Not found"));
+        }catch (MessageException ex){
+            throw new MessageException("Ingredient with id :" + id + " not found !");
+        }
+
+        return inventory.getIngredient_quantity() ;
+    }
 }

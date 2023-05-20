@@ -49,8 +49,13 @@ public class MenuService {
     public ResponseEntity<List<Menu>> getAllItems() {
 
         List<Menu> menuItems = menuRepository.findAll();
-        List<Inventory> fetchedIngredient = webClient.get().uri("http://localhost:8082/api/inventory").retrieve().bodyToMono(new ParameterizedTypeReference<List<Inventory>>() {
-        }).block();
+        List<Inventory> fetchedIngredient = new ArrayList<>() ;
+        try{
+            fetchedIngredient = webClient.get().uri("http://localhost:8082/api/inventory").retrieve().bodyToMono(new ParameterizedTypeReference<List<Inventory>>() {
+            }).block();
+        }catch(WebClientRequestException e){
+            throw new MessageException(e.getMessage());
+        }
 
 
         for (Menu menu : menuItems) {
@@ -93,7 +98,11 @@ public class MenuService {
                 throw new MessageException("Ingredient With Id : " + id + " was Not found");
             }
         }
-        menuRepository.save(menu);
+        try{
+            menuRepository.save(menu);
+        }catch (MessageException e){
+            throw new MessageException(e.getMessage());
+        }
         return ResponseEntity.ok(new SuccessResponse("Menu Item Created Successfully", HttpStatus.OK.toString()));
     }
 

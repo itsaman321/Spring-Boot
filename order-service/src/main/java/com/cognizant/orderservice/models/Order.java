@@ -29,7 +29,8 @@ public class Order {
 
     private Integer orderAmount ;
 
-    private List<Integer> menuItemsIds;
+    @OneToMany(cascade = CascadeType.ALL)
+    List<MenuItemQuantity> menuItemQuantityList ;
 
     @Transient
     private List<Menu> menuList ;

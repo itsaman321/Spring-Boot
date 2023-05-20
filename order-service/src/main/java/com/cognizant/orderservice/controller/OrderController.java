@@ -1,10 +1,11 @@
 package com.cognizant.orderservice.controller;
 
 import com.cognizant.orderservice.models.Order;
-import com.cognizant.orderservice.repository.OrderRepository;
+import com.cognizant.orderservice.requestDto.SuccessResponse;
 import com.cognizant.orderservice.requests.StatusRequest;
 import com.cognizant.orderservice.services.OrderService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,17 +28,17 @@ public class OrderController {
     }
 
     @PostMapping("/{userId}")
-    public String placeOrder(@RequestBody Order order, @PathVariable Integer userId){
+    public ResponseEntity<SuccessResponse> placeOrder(@RequestBody Order order, @PathVariable Integer userId){
         return orderService.placeOrder(order,userId);
     }
 
     @PatchMapping("/{orderId}")
-    public String updateOrderStatus(@RequestBody StatusRequest status, @PathVariable Integer orderId){
+    public ResponseEntity<SuccessResponse> updateOrderStatus(@RequestBody StatusRequest status, @PathVariable Integer orderId){
         return orderService.getStatusUpdate(status , orderId);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteOrder(@PathVariable Integer id){
+    public ResponseEntity<SuccessResponse> deleteOrder(@PathVariable Integer id){
         return orderService.deleteOrder(id);
     }
 }

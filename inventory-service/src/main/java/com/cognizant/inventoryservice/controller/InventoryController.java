@@ -30,5 +30,8 @@ public class InventoryController {
         return inventoryService.createIngredient(ing);
     }
 
-
+    @GetMapping("/quantity/{id}")
+    public Integer getQuantity(@PathVariable Integer id){
+        return inventoryService.getQuantityByItem(id);
+    }
 }
