@@ -8,6 +8,7 @@ import com.cognizant.menuservice.repository.MenuRepository;
 import com.cognizant.menuservice.requestDto.SuccessResponse;
 import lombok.AllArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuService {
     private MenuRepository menuRepository;
+    @Autowired
     private WebClient webClient;
 
     public boolean hasNotNullAttributes(Inventory inventory) {
@@ -118,7 +120,7 @@ public class MenuService {
                         })
                         .block();
                 ingredientsList.add(inventoryItem);
-            } catch (WebClientResponseException exception) {
+            } catch (WebClientRequestException exception) {
                 throw new MessageException(exception.getMessage());
             }
         }
