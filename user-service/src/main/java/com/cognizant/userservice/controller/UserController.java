@@ -1,9 +1,9 @@
 package com.cognizant.userservice.controller;
 
 
-import com.cognizant.userservice.UserServiceApplication;
+import com.cognizant.userservice.dto.AuthRequest;
 import com.cognizant.userservice.models.User;
-import com.cognizant.userservice.service.UserService;
+import com.cognizant.userservice.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,30 +15,41 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private UserService userService ;
+    private AuthService authService;
 
     @GetMapping
     public List<User> getAllUser(){
-        return userService.getAllUsers();
+        return authService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public Optional<User> getUserById(@PathVariable Integer id){
-        return userService.getUser(id);
+        return authService.getUser(id);
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public String createNewUser(@RequestBody User user){
-        return userService.createUser(user);
+        return authService.createUser(user);
+    }
+
+    @PostMapping("/token")
+    public String getToken(@RequestBody AuthRequest authRequest){
+        return authService.generateToken(authRequest.getUsername());
+    }
+
+    @GetMapping("/validate")
+    public String validateToken(@RequestParam("token") String token){
+        authService.validateToken(token);
+        return "token is valid !";
     }
 
     @PutMapping("/{id}")
     public String updateUser(@RequestBody User user , @PathVariable Integer id){
-        return userService.updateUserDetails(id, user);
+        return authService.updateUserDetails(id, user);
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Integer id){
-        return userService.deleteUser(id);
+        return authService.deleteUser(id);
     }
 }

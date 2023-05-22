@@ -26,7 +26,4 @@ public class User {
 
     private String user_password ;
 
-    @Transient
-    List<Order> user_orders ;
-
 }

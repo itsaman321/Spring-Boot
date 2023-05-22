@@ -4,24 +4,27 @@ import com.cognizant.userservice.exceptions.ResourceNotFoundException;
 import com.cognizant.userservice.models.User;
 import com.cognizant.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class AuthService {
     private UserRepository userRepository ;
+
+    private PasswordEncoder passwordEncoder ;
+
+    private JwtService jwtService ;
 
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
     public String createUser(User user) {
+        user.setUser_password(passwordEncoder.encode(user.getUser_password()));
         userRepository.save(user);
         return "User Successfully Created" ;
     }
@@ -52,4 +55,13 @@ public class UserService {
          userRepository.deleteById(id);
          return "User Deleted Successfully having ID : " + id ;
     }
+
+    public String generateToken(String username){
+        return jwtService.generateToken(username);
+    }
+
+    public void validateToken(String token){
+        jwtService.validateToken(token);
+    }
+
 }
