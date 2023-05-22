@@ -1,8 +1,7 @@
 package com.cognizant.orderservice.services;
 
 import com.cognizant.orderservice.exceptions.MessageException;
-import com.cognizant.orderservice.exceptions.ResourceNotFoundException;
-import com.cognizant.orderservice.models.Inventory;
+import com.cognizant.orderservice.models.InventoryItem;
 import com.cognizant.orderservice.models.Menu;
 import com.cognizant.orderservice.models.MenuItemQuantity;
 import com.cognizant.orderservice.models.Order;
@@ -10,13 +9,10 @@ import com.cognizant.orderservice.repository.OrderRepository;
 import com.cognizant.orderservice.requestDto.SuccessResponse;
 import com.cognizant.orderservice.requests.StatusRequest;
 import lombok.AllArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -28,7 +24,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -81,12 +76,12 @@ public class OrderService {
 
             //To check inventory for availability
             try {
-                List<Integer> ingredientList = menu.getIngredientIds();
-                for (Integer ingId : ingredientList) {
+                List<InventoryItem> inventoryItemList = menu.getIngredientItemList();
+                for (InventoryItem inventoryItem : inventoryItemList) {
                     Integer itemQuantity;
                     try {
                         itemQuantity = webClient.get()
-                                .uri("http://localhost:8082/api/inventory/quantity/" + ingId)
+                                .uri("http://localhost:8082/api/inventory/quantity/" + inventoryItem.getIngredientid())
                                 .retrieve()
                                 .bodyToMono(new ParameterizedTypeReference<Integer>() {
                                 })
@@ -94,8 +89,8 @@ public class OrderService {
                     } catch (WebClientResponseException e) {
                         throw new MessageException(e.getMessage());
                     }
-                    if (menuItemQuantity.getQuantity() > itemQuantity) {
-                        throw new MessageException("Ingredient Item with Id : " + ingId + " is less quantity. Please check inventory");
+                    if (menuItemQuantity.getQuantity()* inventoryItem.getQuantity() > itemQuantity) {
+                        throw new MessageException("Ingredient Item with Id : " + inventoryItem.getIngredientid() + " is less quantity. Please check inventory");
                     }
                 }
             } catch (MessageException e) {

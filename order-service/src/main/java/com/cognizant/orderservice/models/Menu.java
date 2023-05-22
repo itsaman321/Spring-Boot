@@ -1,16 +1,14 @@
 package com.cognizant.orderservice.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Menu {
 
     private Integer id ;
@@ -18,10 +16,7 @@ public class Menu {
     private String item_description ;
     private Integer item_price ;
 
+    private List<InventoryItem> ingredientItemList ;
 
-    private List<Integer> ingredientIds ;
 
-
-    @JsonIgnore
-    private List<Inventory> ingredients;
 }
