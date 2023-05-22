@@ -3,6 +3,7 @@ package com.cognizant.menuservice.service;
 import com.cognizant.menuservice.exceptions.ExceptionResponse;
 import com.cognizant.menuservice.exceptions.MessageException;
 import com.cognizant.menuservice.model.Inventory;
+import com.cognizant.menuservice.model.InventoryItem;
 import com.cognizant.menuservice.model.Menu;
 import com.cognizant.menuservice.repository.MenuRepository;
 import com.cognizant.menuservice.requestDto.SuccessResponse;
@@ -30,6 +31,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuService {
     private MenuRepository menuRepository;
+
     @Autowired
     private WebClient webClient;
 
@@ -51,24 +53,23 @@ public class MenuService {
     public ResponseEntity<List<Menu>> getAllItems() {
 
         List<Menu> menuItems = menuRepository.findAll();
-        List<Inventory> fetchedIngredient = new ArrayList<>() ;
-        try{
-            fetchedIngredient = webClient.get().uri("http://localhost:8082/api/inventory").retrieve().bodyToMono(new ParameterizedTypeReference<List<Inventory>>() {
-            }).block();
-        }catch(WebClientRequestException e){
-            throw new MessageException(e.getMessage());
-        }
-
 
         for (Menu menu : menuItems) {
             List<Inventory> finalList = new ArrayList<>();
-            List<Integer> ingIds = menu.getIngredientIds();
-            if (ingIds != null) {
-                for (Integer id : ingIds) {
-                    for (Inventory fIng : fetchedIngredient) {
-                        if (id.equals(fIng.getIngredient_id())) {
-                            finalList.add(fIng);
-                        }
+            List<InventoryItem> inventoryItemList = menu.getIngredientItemList();
+            if (inventoryItemList != null) {
+                for (InventoryItem inventoryItem : inventoryItemList) {
+                    try {
+                        Inventory inv = webClient.get()
+                                .uri("http://localhost:8082/api/inventory/" + inventoryItem.getIngredientid()).retrieve()
+                                .bodyToMono(new ParameterizedTypeReference<Inventory>() {
+                                })
+                                .block();
+                        finalList.add(inv);
+                    } catch (WebClientRequestException exception) {
+                        throw new MessageException(exception.getMessage());
+                    } catch (MessageException e){
+                        throw new MessageException("Specifed Ingredient with Id : "+ inventoryItem.getIngredientid() + " does not exist..");
                     }
                 }
             }
@@ -91,13 +92,13 @@ public class MenuService {
     }
 
     public ResponseEntity<SuccessResponse> createMenuItem(Menu menu) {
-        List<Integer> ingredientIds = menu.getIngredientIds();
+        List<InventoryItem> inventoryItemList = menu.getIngredientItemList();
 
-        for (Integer id : ingredientIds) {
+        for (InventoryItem inventoryItem : inventoryItemList) {
             //Checking if Ingredient is available in inventory
-            Mono<Boolean> itemExist = checkIfInventoryExist(id);
+            Mono<Boolean> itemExist = checkIfInventoryExist(inventoryItem.getIngredientid());
             if (Boolean.FALSE.equals(itemExist.block())) {
-                throw new MessageException("Ingredient With Id : " + id + " was Not found");
+                throw new MessageException("Ingredient With Id : " + inventoryItem.getIngredientid() + " was Not found");
             }
         }
         try{
@@ -111,15 +112,15 @@ public class MenuService {
     public ResponseEntity<Menu> getItemById(Integer id) {
         Menu menu = menuRepository.findById(id).orElseThrow(() -> new MessageException("Menu Item With Id : " + id + " does not exists.."));
         List<Inventory> ingredientsList = new ArrayList<>();
-        List<Integer> idArr = menu.getIngredientIds();
-        for (Integer ingId : idArr) {
+        List<InventoryItem> inventoryItemList = menu.getIngredientItemList();
+        for (InventoryItem inventoryItem : inventoryItemList) {
             try {
-                Inventory inventoryItem = webClient.get()
-                        .uri("http://localhost:8082/api/inventory/" + ingId).retrieve()
+                Inventory inv = webClient.get()
+                        .uri("http://localhost:8082/api/inventory/" + inventoryItem.getIngredientid()).retrieve()
                         .bodyToMono(new ParameterizedTypeReference<Inventory>() {
                         })
                         .block();
-                ingredientsList.add(inventoryItem);
+                ingredientsList.add(inv);
             } catch (WebClientRequestException exception) {
                 throw new MessageException(exception.getMessage());
             }
@@ -133,7 +134,7 @@ public class MenuService {
         updatedMenuItem.setItem_name(menu.getItem_name());
         updatedMenuItem.setItem_description(menu.getItem_description());
         updatedMenuItem.setItem_price(menu.getItem_price());
-        updatedMenuItem.setIngredientIds(menu.getIngredientIds());
+        updatedMenuItem.setIngredientItemList(menu.getIngredientItemList());
         try {
             menuRepository.save(updatedMenuItem);
         } catch (MessageException e) {

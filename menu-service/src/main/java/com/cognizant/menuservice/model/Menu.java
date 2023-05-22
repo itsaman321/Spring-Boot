@@ -21,7 +21,8 @@ public class Menu {
     private Integer item_price ;
 
 
-    private List<Integer> ingredientIds ;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<InventoryItem> ingredientItemList ;
 
     @Transient
     private List<Inventory> ingredients;
