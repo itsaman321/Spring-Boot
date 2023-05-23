@@ -2,9 +2,13 @@ package com.cognizant.userservice.controller;
 
 
 import com.cognizant.userservice.dto.AuthRequest;
+import com.cognizant.userservice.exceptions.MessageException;
 import com.cognizant.userservice.models.User;
 import com.cognizant.userservice.service.AuthService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +20,8 @@ import java.util.Optional;
 public class UserController {
 
     private AuthService authService;
+
+    private AuthenticationManager authenticationManager ;
 
     @GetMapping
     public List<User> getAllUser(){
@@ -34,7 +40,14 @@ public class UserController {
 
     @PostMapping("/token")
     public String getToken(@RequestBody AuthRequest authRequest){
-        return authService.generateToken(authRequest.getUsername());
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+
+            if(authenticate.isAuthenticated()){
+                return authService.generateToken(authRequest.getUsername());
+            }else{
+                throw new MessageException("Invalid Access !");
+            }
+
     }
 
     @GetMapping("/validate")

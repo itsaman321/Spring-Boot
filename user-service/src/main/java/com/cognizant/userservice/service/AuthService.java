@@ -1,6 +1,6 @@
 package com.cognizant.userservice.service;
 
-import com.cognizant.userservice.exceptions.ResourceNotFoundException;
+import com.cognizant.userservice.exceptions.MessageException;
 import com.cognizant.userservice.models.User;
 import com.cognizant.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -39,9 +39,9 @@ public class AuthService {
     }
 
     public String updateUserDetails(Integer id, User user) {
-        User exUser = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Error: Not Found")) ;
+        User exUser = userRepository.findById(id).orElseThrow(()-> new MessageException("Error: Not Found")) ;
 
-            exUser.setUser_name(user.getUser_name());
+            exUser.setName(user.getName());
             exUser.setUser_email(user.getUser_email());
             exUser.setUser_password(user.getUser_password());
             exUser.setUser_phone(user.getUser_phone());
