@@ -11,16 +11,29 @@ spring:
           uri: lb://MENU-SERVICE
           predicates:
             - Path=/api/menu/**
+          filters:
+            - AuthenticationFilter
 
         - id: INVENTORY-SERVICE
           uri: lb://INVENTORY-SERVICE
           predicates:
             - Path=/api/inventory/**
+          filters:
+            - AuthenticationFilter
 
         - id: ORDER-SERVICE
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/api/order/**
+          filters:
+            - AuthenticationFilter
+
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - AuthenticationFilter
 
 
 eureka:
