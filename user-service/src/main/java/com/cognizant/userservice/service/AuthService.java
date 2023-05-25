@@ -4,6 +4,7 @@ import com.cognizant.userservice.exceptions.MessageException;
 import com.cognizant.userservice.models.User;
 import com.cognizant.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,11 @@ public class AuthService {
 
     public String createUser(User user) {
         user.setUser_password(passwordEncoder.encode(user.getUser_password()));
-        userRepository.save(user);
+        try{
+            userRepository.save(user);
+        }catch (DataIntegrityViolationException e){
+            throw new MessageException(e.getMessage());
+        }
         return "User Successfully Created" ;
     }
 
