@@ -1,10 +1,7 @@
 package com.cognizant.orderservice.services;
 
 import com.cognizant.orderservice.exceptions.MessageException;
-import com.cognizant.orderservice.models.InventoryItem;
-import com.cognizant.orderservice.models.Menu;
-import com.cognizant.orderservice.models.MenuItemQuantity;
-import com.cognizant.orderservice.models.Order;
+import com.cognizant.orderservice.models.*;
 import com.cognizant.orderservice.repository.OrderRepository;
 import com.cognizant.orderservice.requestDto.SuccessResponse;
 import com.cognizant.orderservice.requests.StatusRequest;
@@ -63,7 +60,29 @@ public class OrderService {
         return menu;
     }
 
+    public Boolean fetchUserById(Integer id){
+        User user  ;
+        try{
+           user = webClient.get()
+                    .uri("http://localhost:8081/api/users/"+id)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<User>() {
+                    })
+                    .block();
+        }catch (WebClientResponseException e){
+            throw new MessageException(e.getMessage());
+        }
+
+        if(user != null) return true ;
+        else return false ;
+    }
+
     public ResponseEntity<SuccessResponse> placeOrder(Order order, Integer userId) {
+
+
+        if(!fetchUserById(userId)){
+            throw new MessageException("User ID Not found !");
+        }
         order.setUserId(userId);
 
         List<MenuItemQuantity> menuItemQuantities = order.getMenuItemQuantityList();
